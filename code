@@ -1,0 +1,84 @@
+import pygame
+
+glo_x = 1800
+glo_y = 1200
+
+win_width = 800
+win_height = 600
+
+win = pygame.display.set_mode((win_width,win_height))
+pygame.display.set_caption('Urban Strike')
+clock = pygame.time.Clock()
+
+
+# Игровая карта с изображением ландшафта
+'''background = pygame.image.load("map1.png")
+background = pygame.transform.scale(background, (1800,1200))'''
+win.fill((255, 255, 255))
+
+# Класс GameSprite для объектов
+class GameSprite(pygame.sprite.Sprite):
+    # конструктор класса
+    def __init__(self, player_image, player_x, player_y, player_width, player_heigth, player_speed):
+        super().__init__()
+        self.image = pygame.transform.scale(pygame.image.load(player_image), (player_width, player_heigth))    
+        self.speed = player_speed
+        self.rect = self.image.get_rect()
+        self.rect.x = player_x
+        self.rect.y = player_y 
+	# Метод перерисовки персонажа
+    def reset(self):
+        win.blit(self.image, (self.rect.x, self.rect.y))
+
+class Map(GameSprite):
+    def update(self):
+        keys_pressed = pygame.key.get_pressed()
+        if keys_pressed[pygame.K_LEFT] and self.rect.x < 0:
+            if player.rect.x < 500:
+                self.rect.x += player.speed
+        if keys_pressed[pygame.K_RIGHT] and self.rect.x > -1800 + win_width:
+            if player.rect.x > -1000:
+                self.rect.x -= player.speed
+        if keys_pressed[pygame.K_DOWN] and self.rect.y > -1200 + win_height:
+            self.rect.y -= player.speed
+        if keys_pressed[pygame.K_UP] and self.rect.y < 0:
+            self.rect.y += player.speed
+        
+
+
+class Helicopter(GameSprite):
+    def update(self):
+        keys_pressed = pygame.key.get_pressed()
+        if keys_pressed[pygame.K_LEFT] and glo_x - :
+            if landscape.rect.x > -5:
+                self.rect.x -= player.speed
+        if keys_pressed[pygame.K_RIGHT]and self.rect.x < 50:
+            if landscape.rect.x < - 1795 + win_width:
+                self.rect.x += player.speed 
+                '''
+        if keys_pressed[pygame.K_DOWN]:
+            self.rect.y -= player.speed
+        if keys_pressed[pygame.K_UP]:
+            self.rect.y += player.speed'''
+        
+        
+
+player = Helicopter("ball.png", 400, 300, 50, 50, 20)
+landscape = Map("map1.png", 0 , 0, 1800, 1200, 0)
+
+game_process = True
+while game_process:
+    for e in pygame.event.get():
+        if e.type == pygame.QUIT:
+            game_process = False
+
+    landscape.reset()
+    player.reset()
+    
+
+    landscape.update()
+    player.update()
+    
+
+    pygame.display.update()
+    clock.tick(40)
