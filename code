@@ -7,6 +7,8 @@ win_height = 600
 globX = 0
 globY = 0
 move = True
+angle = 180
+
 heli_suits = []
 for i in range(8):
     name = str(i+1) + ".png"
@@ -54,6 +56,8 @@ class Map(GameSprite):
             win.blit(self.image, (globX, globY))
         else:
             win.blit(self.image, (globX, globY))
+
+
             
 class Helicopter(GameSprite):
     def update(self):
@@ -61,6 +65,7 @@ class Helicopter(GameSprite):
         keys_pressed = key.get_pressed()
 
         if keys_pressed[K_LEFT]:
+            angle = 270
             heli.image = transform.scale(image.load("1.png"), (160,100))
             if abs(globX) + self.rect.x < 400 or abs(globX) + self.rect.x > 1400:
                 if self.rect.x > 0:
@@ -71,6 +76,7 @@ class Helicopter(GameSprite):
                 move = True
 
         if keys_pressed[K_RIGHT]:
+            angle = 90
             heli.image = transform.scale(image.load("4.png"), (160,100))
             if abs(globX) + self.rect.x < 400 or abs(globX) + self.rect.x > 1400:
                 if self.rect.x < win_width - self.rect.width: 
@@ -79,6 +85,7 @@ class Helicopter(GameSprite):
             else:
                 move = True
         if keys_pressed[K_UP]:
+            angle = 0
             heli.image = transform.scale(image.load("7.png"), (160,100))
             if abs(globY) + self.rect.y <= 300 or abs(globY) + self.rect.y >= 900:
                 if self.rect.y > 0:
@@ -88,6 +95,7 @@ class Helicopter(GameSprite):
                 move = True
 
         if keys_pressed[K_DOWN]:
+            angle = 180
             heli.image = transform.scale(image.load("2.png"), (160,100))
             if abs(globY) + self.rect.y <= 300 or abs(globY) + self.rect.y >= 900:
                 if self.rect.y < win_height - self.rect.height: 
@@ -95,6 +103,12 @@ class Helicopter(GameSprite):
                     self.rect.y += self.speed
             else:
                 move = True
+
+        if keys_pressed[K_SPACE]:
+            rocket = Bullet("2.png", self.rect.x, self.rect.y, 50, 50, 30)
+            rockets.add(rocket)
+
+
 
         
     
@@ -104,6 +118,22 @@ class Enemy(GameSprite):
         self.rect.x = startX + globX
         self.rect.y = startY + globY
 
+class Bullet(GameSprite):
+    def update(self):
+        global angle
+        if angle == 0:
+            self.rect.y -= speed
+        elif angle == 90:
+            self.rect.x += speed 
+        elif angle == 270:
+            self.rect.x -= speed
+        elif angle == 180:
+            self.rect.y += speed 
+        else:
+            pass
+        
+        if math.sqrt((heli.rect.x - self.rect.x)*(heli.rect.x - self.rect.x)+(heli.rect.y - self.rect.y)*(heli.rect.y - self.rect.y)) > 200:
+            self.kill
             
        
 
@@ -116,12 +146,13 @@ coord2 = font1.render("X:" +  str(globX) + "  " + "Y:" +  str(globY), True, (255
 heli = Helicopter("2.png", 400, 300, 160, 100, 15)
 landscape = Map("map1.png", globX, globY, 1800, 1200, 0)
 skelet = Enemy("skelet.png", 900, 400, 100, 100, 0)
-skelet = Enemy("skelet.png", 927, 120, 100, 100, 0)
-skelet = Enemy("skelet.png", 100, 431, 100, 100, 0)
-skelet = Enemy("skelet.png", 1500, 130, 100, 100, 0)
-skelet = Enemy("skelet.png", 200, 1050, 100, 100, 0)
-skelet = Enemy("skelet.png", 333, 777, 100, 100, 0)
-skelet = Enemy("skelet.png", 500, 999, 100, 100, 0)
+skelet1 = Enemy("skelet.png", 927, 120, 100, 100, 0)
+skelet2 = Enemy("skelet.png", 100, 431, 100, 100, 0)
+skelet3 = Enemy("skelet.png", 1500, 130, 100, 100, 0)
+skelet4 = Enemy("skelet.png", 200, 1050, 100, 100, 0)
+skelet5 = Enemy("skelet.png", 333, 777, 100, 100, 0)
+skelet6 = Enemy("skelet.png", 500, 999, 100, 100, 0)
+rocket = sprite.Group()
 
 
 run = True
@@ -138,6 +169,20 @@ while run:
     heli.update()
     skelet.reset()
     skelet.update(900,400)
+    skelet1.reset()
+    skelet1.update(927, 120)
+    skelet2.reset()
+    skelet2.update(100, 431)
+    skelet3.reset()
+    skelet3.update(1500, 130)
+    skelet4.reset()
+    skelet4.update(200, 1050)
+    skelet5.reset()
+    skelet5.update(333, 777)
+    skelet6.reset()
+    skelet6.update(500, 999)
+    rockets.draw(win)
+    rockets.update()
     coord = font1.render("X:" +  str(heli.rect.x) + "  " + "Y:" +  str(heli.rect.y), True, (255,255,255))
     coord2 = font1.render("X:" +  str(globX) + "  " + "Y:" +  str(globY), True, (255,255,255))
     win.blit(coord, (20,10))
