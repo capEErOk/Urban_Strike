@@ -116,6 +116,12 @@ coord2 = font1.render("X:" +  str(globX) + "  " + "Y:" +  str(globY), True, (255
 heli = Helicopter("2.png", 400, 300, 160, 100, 15)
 landscape = Map("map1.png", globX, globY, 1800, 1200, 0)
 skelet = Enemy("skelet.png", 900, 400, 100, 100, 0)
+skelet = Enemy("skelet.png", 927, 120, 100, 100, 0)
+skelet = Enemy("skelet.png", 100, 431, 100, 100, 0)
+skelet = Enemy("skelet.png", 1500, 130, 100, 100, 0)
+skelet = Enemy("skelet.png", 200, 1050, 100, 100, 0)
+skelet = Enemy("skelet.png", 333, 777, 100, 100, 0)
+skelet = Enemy("skelet.png", 500, 999, 100, 100, 0)
 
 
 run = True
