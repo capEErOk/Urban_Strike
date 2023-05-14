@@ -6,14 +6,8 @@ win_height = 600
 
 globX = 0
 globY = 0
-move = True
+move = False
 angle = 180
-
-heli_suits = []
-for i in range(8):
-    name = str(i+1) + ".png"
-    picture = image.load(name)
-    heli_suits.append(picture)
 
 BLACK = (0,0,0)
 
@@ -53,37 +47,38 @@ class Map(GameSprite):
             if keys_pressed[K_DOWN] and globY > win_height - self.rect.height:
                 globY -= heli.speed
 
+            
+
+
             win.blit(self.image, (globX, globY))
         else:
             win.blit(self.image, (globX, globY))
-
-
             
 class Helicopter(GameSprite):
     def update(self):
-        global globX, globY, move
+        global globX, globY, move, angle
         keys_pressed = key.get_pressed()
 
         if keys_pressed[K_LEFT]:
             angle = 270
             heli.image = transform.scale(image.load("1.png"), (160,100))
-            if abs(globX) + self.rect.x < 400 or abs(globX) + self.rect.x > 1400:
+            if abs(globX) + self.rect.x <= 400 or abs(globX) + self.rect.x >= 1400:
                 if self.rect.x > 0:
                     move = False
                     self.rect.x -= self.speed
-                    
             else:
                 move = True
 
         if keys_pressed[K_RIGHT]:
             angle = 90
             heli.image = transform.scale(image.load("4.png"), (160,100))
-            if abs(globX) + self.rect.x < 400 or abs(globX) + self.rect.x > 1400:
+            if abs(globX) + self.rect.x <= 400 or abs(globX) + self.rect.x >= 1400:
                 if self.rect.x < win_width - self.rect.width: 
                     move = False
                     self.rect.x += self.speed
             else:
                 move = True
+        
         if keys_pressed[K_UP]:
             angle = 0
             heli.image = transform.scale(image.load("7.png"), (160,100))
@@ -104,57 +99,60 @@ class Helicopter(GameSprite):
             else:
                 move = True
 
+        '''if keys_pressed[K_DOWN] and keys_pressed[K_RIGHT]:
+            heli.image = transform.scale(image.load("7.png"), (160,100))
+            move = False
+            self.rect.y += (self.speed * math.sqrt(2)/2)
+            self.rect.x += (self.speed * math.sqrt(2)/2)'''
         if keys_pressed[K_SPACE]:
-            rocket = Bullet("2.png", self.rect.x, self.rect.y, 50, 50, 30)
+            rocket = Bullet("Ball.png", self.rect.x, self.rect.y, 50, 50, 30)
             rockets.add(rocket)
 
-
-
-        
-    
 class Enemy(GameSprite):
-    def update(self, startX, startY):
-        global glovX, globY
+    def update(self,startX,startY):
+        global globX, globY
         self.rect.x = startX + globX
         self.rect.y = startY + globY
 
 class Bullet(GameSprite):
     def update(self):
-        global angle
+        global angle 
         if angle == 0:
-            self.rect.y -= speed
+            self.rect.y -= self.speed
         elif angle == 90:
-            self.rect.x += speed 
+            self.rect.x += self.speed
         elif angle == 270:
-            self.rect.x -= speed
+            self.rect.x -= self.speed
         elif angle == 180:
-            self.rect.y += speed 
+            self.rect.y += self.speed    
         else:
             pass
-        
-        if math.sqrt((heli.rect.x - self.rect.x)*(heli.rect.x - self.rect.x)+(heli.rect.y - self.rect.y)*(heli.rect.y - self.rect.y)) > 200:
-            self.kill
-            
-       
+
+        if math.sqrt((heli.rect.x - self.rect.x)*(heli.rect.x - self.rect.x) + 
+                        (heli.rect.y - self.rect.y)*(heli.rect.y - self.rect.y)) > 150:
+            self.kill()
+    
 
 font.init()
-font1 = font.SysFont("Arial", 50)
+font1 = font.SysFont("Arial", 20)
 coord = font1.render("X:" +  str(globX) + "  " + "Y:" +  str(globY), True, (255,255,255))
 coord2 = font1.render("X:" +  str(globX) + "  " + "Y:" +  str(globY), True, (255,255,255))
 
-
-heli = Helicopter("2.png", 400, 300, 160, 100, 15)
+heli = Helicopter("4.png", 390, 300, 160, 100, 15)
 landscape = Map("map1.png", globX, globY, 1800, 1200, 0)
-skelet = Enemy("skelet.png", 900, 400, 100, 100, 0)
+skelet = Enemy("skelet.png", 100, 800, 100, 100, 0)
 skelet1 = Enemy("skelet.png", 927, 120, 100, 100, 0)
-skelet2 = Enemy("skelet.png", 100, 431, 100, 100, 0)
+skelet2 = Enemy("skelet.png", 55, 431, 100, 100, 0)
 skelet3 = Enemy("skelet.png", 1500, 130, 100, 100, 0)
 skelet4 = Enemy("skelet.png", 200, 1050, 100, 100, 0)
 skelet5 = Enemy("skelet.png", 333, 777, 100, 100, 0)
 skelet6 = Enemy("skelet.png", 500, 999, 100, 100, 0)
-rocket = sprite.Group()
+rockets = sprite.Group()
+task = GameSprite("Ball.png", 50, 400, 50, 50, 0)
 
 
+all_sprite = sprite.Group()
+fires = sprite.Group()
 run = True
 while run:
     for e in event.get():
@@ -162,13 +160,12 @@ while run:
             run = False
     
     
-
 #    landscape.reset()
     landscape.update()
     heli.reset()
     heli.update()
     skelet.reset()
-    skelet.update(900,400)
+    skelet.update(1200,900)
     skelet1.reset()
     skelet1.update(927, 120)
     skelet2.reset()
@@ -183,10 +180,29 @@ while run:
     skelet6.update(500, 999)
     rockets.draw(win)
     rockets.update()
-    coord = font1.render("X:" +  str(heli.rect.x) + "  " + "Y:" +  str(heli.rect.y), True, (255,255,255))
+
+    if sprite.spritecollide(skelet, rockets, False):
+        skelet.image = transform.scale(image.load("skelet123.png"), (100,100))
+    elif sprite.spritecollide(skelet1, rockets, False):
+        skelet1.image = transform.scale(image.load("skelet123.png"), (100,100))
+    elif sprite.spritecollide(skelet2, rockets, False):
+        skelet2.image = transform.scale(image.load("skelet123.png"), (100,100))
+    elif sprite.spritecollide(skelet3, rockets, False):
+        skelet3.image = transform.scale(image.load("skelet123.png"), (100,100))
+    elif sprite.spritecollide(skelet4, rockets, False):
+        skelet4.image = transform.scale(image.load("skelet123.png"), (100,100))
+    elif sprite.spritecollide(skelet5, rockets, False):
+        skelet5.image = transform.scale(image.load("skelet123.png"), (100,100))
+    elif sprite.spritecollide(skelet6, rockets, False):
+        skelet6.image = transform.scale(image.load("skelet123.png"), (100,100))
+
+
+    
+    coord = font1.render("X:" +  str(heli.rect.x) + "  " + "Y:" +  str(globY), True, (255,255,255))
     coord2 = font1.render("X:" +  str(globX) + "  " + "Y:" +  str(globY), True, (255,255,255))
     win.blit(coord, (20,10))
     win.blit(coord2, (20,60))
+
 
     display.update()
     clock.tick(FPS)
